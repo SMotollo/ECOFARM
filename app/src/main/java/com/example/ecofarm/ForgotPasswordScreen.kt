@@ -11,6 +11,7 @@ import androidx.navigation.NavController
 @Composable
 fun ForgotPasswordScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
+    var message by remember { mutableStateOf("") }
 
     Column(
         modifier = Modifier
@@ -35,10 +36,24 @@ fun ForgotPasswordScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(
-            onClick = { /* Lógica para enviar e-mail de recuperação */ },
+            onClick = {
+                // Lógica para enviar o e-mail de recuperação
+                if (email.isNotEmpty()) {
+                    // Exemplo fictício de envio de recuperação
+                    message = "E-mail de recuperação enviado para $email"
+                } else {
+                    message = "Por favor, insira um e-mail válido"
+                }
+            },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Enviar")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        if (message.isNotEmpty()) {
+            Text(message, color = MaterialTheme.colorScheme.primary)
         }
     }
 }

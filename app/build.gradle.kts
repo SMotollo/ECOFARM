@@ -1,10 +1,11 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
+    id("org.jetbrains.kotlin.kapt") // Adicionei o plugin kapt
 }
 
 android {
-    namespace = "com.example.ecofarm" // Defina o namespace aqui, que corresponde ao 'package' no AndroidManifest.xml
+    namespace = "com.example.ecofarm"
     compileSdk = 34
 
     defaultConfig {
@@ -24,11 +25,11 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = "17" // Ajuste o jvmTarget para compatibilidade com o Kotlin
+        jvmTarget = "17"
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17 // Definir a versão do Java para 17
+        sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
 }
@@ -40,9 +41,8 @@ dependencies {
     implementation("androidx.compose.ui:ui:1.6.1")
     implementation("androidx.compose.material3:material3:1.2.1")
     implementation("androidx.compose.ui:ui-tooling-preview:1.6.1")
-    implementation(libs.androidx.foundation.android)
-    debugImplementation("androidx.compose.ui:ui-tooling:1.6.1")
-
-    // Adicionando dependências de navegação
+    implementation("androidx.room:room-runtime:2.5.2")
+    kapt("androidx.room:room-compiler:2.5.2") // Configuração do kapt
     implementation("androidx.navigation:navigation-compose:2.5.3")
+    debugImplementation("androidx.compose.ui:ui-tooling:1.6.1")
 }

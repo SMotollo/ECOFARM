@@ -9,14 +9,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
+import android.content.Context
 import androidx.navigation.NavController
+import kotlinx.coroutines.launch
 
 @Composable
 fun RegisterScreen(navController: NavController) {
-    var username by remember { mutableStateOf("") }
+    val context = LocalContext.current
+    val db = AppDatabase.getInstance(context)
+    val userDao = db.userDao()
+
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
+    var message by remember { mutableStateOf("") }
+    val scope = rememberCoroutineScope()
 
     Column(
         modifier = Modifier
@@ -25,67 +33,47 @@ fun RegisterScreen(navController: NavController) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Cabeçalho
-        Text(
-            text = "Tela de Cadastro",
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-
-        // Campo de nome de usuário
-        TextField(
-            value = username,
-            onValueChange = { username = it },
-            label = { Text("Nome de Usuário") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Campo de e-mail
         TextField(
             value = email,
             onValueChange = { email = it },
             label = { Text("E-mail") },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Campo de senha
         TextField(
             value = password,
             onValueChange = { password = it },
             label = { Text("Senha") },
             visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             modifier = Modifier.fillMaxWidth()
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Campo de confirmar senha
         TextField(
             value = confirmPassword,
             onValueChange = { confirmPassword = it },
             label = { Text("Confirmar Senha") },
             visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-        // Botão de cadastro
         Button(
             onClick = {
                 if (password == confirmPassword) {
-                    // Lógica de cadastro
-                    navController.navigate("login")
+                    message = "Cadastrando..."
+                    // Salvar no banco de dados
+                    scope.launch {
+                        userDao.insertUser(User(email, password))
+                        message = "Usuário cadastrado com sucesso!"
+                        navController.navigate("login")
+                    }
                 } else {
-                    // Exibe um alerta caso as senhas não coincidam
-                    // (Pode ser expandido para mostrar mensagens na tela)
+                    message = "As senhas não coincidem"
                 }
             },
             modifier = Modifier.fillMaxWidth()
@@ -95,9 +83,12 @@ fun RegisterScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Navegação para a tela de login
+        if (message.isNotEmpty()) {
+            Text(message, color = MaterialTheme.colorScheme.primary)
+        }
+
         TextButton(onClick = { navController.navigate("login") }) {
-            Text("Já possui uma conta? Faça login", color = MaterialTheme.colorScheme.primary)
+            Text("Já possui uma conta? Faça login")
         }
     }
 }
